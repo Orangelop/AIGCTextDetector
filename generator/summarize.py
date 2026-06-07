@@ -29,8 +29,8 @@ def summarize_batch(batch):
         f'=== 章节 [{i}] ===\n{c["content"][:8000]}' for i, c in enumerate(batch)
     )
     prompt = (
-        f"以下有 {len(batch)} 个章节，用 === 章节 [编号] === 分隔。"
-        "请分别概括每章约 500 字的主要情节，不要偷工减料。"
+        f"以下有 {len(batch)} 个文章，用 === [编号] === 分隔。"
+        "请分别概括每篇文章约 500 字的主要内容，不要偷工减料。"
         "严格按以下 JSON 格式输出，JSON 里用 Markdown 格式，不要输出任何其他内容，始终使用简体中文:\n"
         '[{"id": 0, "summary": "..."}, {"id": 1, "summary": "..."}, ...]\n\n'
         + chapters_text

@@ -1,3 +1,7 @@
+"""
+八分类器
+"""
+
 from sklearn.naive_bayes import MultinomialNB
 
 from loader import load_dataset, to_col, gen_folders

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__chrome-devtools__take_screenshot",
+      "Bash(python plot_training_curves.py --simulate)"
+    ]
+  }
+}

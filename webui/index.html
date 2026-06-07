@@ -197,50 +197,8 @@
   <script>
   'use strict';
 
-  // ── LOFTER ────────────────────────────────────────────────────────────────
-  const LOFTER = (() => {
-    const PROXY = 'http' + 's://cors.9' + '94321.x' + 'yz/cors';
-    const RE = /https?:\/\/(.+)\.lofter\.com\/post\/([0-9a-fA-F]+)_([0-9a-fA-F]+)/;
-
-    function extractLink(text) { return text.match(RE); }
-
-    async function getContent(m) {
-      const [, blogName, blogHex, postHex] = m;
-      const r = await fetch(PROXY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: 'https://api.lofter.com/oldapi/post/detail.api?product=lofter-android-7.9.10',
-          method: 'POST',
-          headers: {
-            'lofProduct': 'lofter-android-7.9.10',
-            'User-Agent': 'LOFTER-Android 7.9.10 (null; Android 16; null) MOBILE',
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams({
-            supportposttypes: '1,2,3,4,5,6',
-            blogdomain: blogName + '.lofter.com',
-            postid: parseInt(postHex, 16).toString(),
-            blogId: parseInt(blogHex, 16).toString(),
-            postdigestnew: '1', checkpwd: '1', needgetpoststat: '1'
-          }).toString()
-        })
-      });
-      if (!r.ok) throw new Error(`Proxy error: ${r.status}`);
-      const res = await r.json();
-      if (res.status >= 400) throw new Error(`API error: ${res.status}`);
-      const body = typeof res.body === 'string' ? JSON.parse(res.body) : res.body;
-      const content = body?.response?.posts?.[0]?.post?.content;
-      if (!content) throw new Error('No content found');
-      return content.replace(/<[^>]*?>/g, ' ').replace(/&nbsp;/g, ' ')
-        .split('\n').map(l => l.replace(/^\s+/, '')).join('\n').trim();
-    }
-
-    return { extractLink, getContent };
-  })();
-
   // ──────────────────────────────────────────────────────────────────────────
-  // Actual AI Detection Module starts here
+  // AI Detection Module
   // ──────────────────────────────────────────────────────────────────────────
 
   // ── Constants ────────────────────────────────────────────────────────────
@@ -636,24 +594,6 @@
     document.getElementById('stats').textContent         = '';
     document.getElementById('weightedStats').textContent = '';
     document.getElementById('shortWarning').textContent  = '';
-
-    // Check for LOFTER link
-    const lofterMatch = LOFTER.extractLink(text);
-    if (lofterMatch) {
-      if (confirm(`检测到 LOFTER 链接 (${lofterMatch[0]}).\n\n获取并分析这篇文章?`)) {
-        try {
-          document.getElementById('result').textContent = 'Fetching LOFTER content…';
-          text = await LOFTER.getContent(lofterMatch);
-          document.getElementById('inputText').value = text;
-        } catch (err) {
-          document.getElementById('result').innerHTML =
-            `<span style="color:red">LOFTER extraction error: ${err.message}</span>`;
-          btn.disabled    = false;
-          btn.textContent = 'Analyze Text';
-          return;
-        }
-      }
-    }
 
     // Yield to the browser for a repaint, then classify synchronously
     setTimeout(() => {

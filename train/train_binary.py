@@ -1,4 +1,5 @@
 """
+二分类器训练
 Two-stage TF-IDF + LinearSVC training for web deployment.
 
 Stage 1: Full TF-IDF + SVC → export full model, rank features by |idf · coef|
@@ -31,13 +32,17 @@ def _train_one(model_name, label_idx, train_set, test_set, C, top_k):
     x_train = np.array(x_train); y_train = np.array(y_train)
     x_test, y_test = to_col(test_set, only_model=model_name)
     x_test = np.array(x_test); y_test = np.array(y_test)
+
     print(f"[{model_name}] Train: {len(x_train):,}  Test: {len(x_test):,}")
+
     mask_tr = (y_train == 0) | (y_train == label_idx)
     X_tr = x_train[mask_tr]; y_tr = (y_train[mask_tr] == label_idx).astype(int)
+
     mask_te = (y_test == 0) | (y_test == label_idx)
     X_te = x_test[mask_te]; y_te = (y_test[mask_te] == label_idx).astype(int)
 
     # Stage 1: full features -> full model export + ranking
+
     print(f"\n[{model_name}] Stage 1: full TF-IDF + SVC ...", flush=True)
     tfidf_full = TfidfVectorizer(analyzer="char", ngram_range=(2, 5),
                                  min_df=3, sublinear_tf=True)
@@ -53,11 +58,13 @@ def _train_one(model_name, label_idx, train_set, test_set, C, top_k):
           f"[tn={tn1} fp={fp1} fn={fn1} tp={tp1}]")
 
     # Export full model
+
     joblib.dump(tfidf_full, os.path.join(OUTPUT_DIR, f'tfidf_full_{model_name}.joblib'))
     joblib.dump(svc_full,   os.path.join(OUTPUT_DIR, f'model_full_{model_name}.joblib'))
     print(f"  [{model_name}] Saved full model ({n_full:,} features)")
 
     # Select top-K
+
     importance = np.abs(tfidf_full.idf_ * svc_full.coef_[0])
     k = min(top_k, n_full)
     top_idx = np.argpartition(importance, -k)[-k:]
@@ -66,6 +73,7 @@ def _train_one(model_name, label_idx, train_set, test_set, C, top_k):
     del tfidf_full, svc_full, X_tr_full
 
     # Stage 2: restricted features -> pruned model export
+    
     print(f"[{model_name}] Stage 2: top-{k:,} TF-IDF + SVC ...", flush=True)
     tfidf = TfidfVectorizer(analyzer="char", ngram_range=(2, 5),
                             sublinear_tf=True, vocabulary=restricted_vocab)

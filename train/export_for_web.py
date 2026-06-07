@@ -1,5 +1,6 @@
 """
 Export two-stage TF-IDF + LinearSVC models to models.json for browser inference.
+将两阶段TF-IDF + LinearSVC模型导出到models.json文件中，以便浏览器进行推理。
 
 Since models are trained on restricted vocabulary (see train_binary.py),
 ALL features are exported — no pruning needed → zero accuracy gap.
@@ -11,8 +12,6 @@ Each feature: gram → [combined, idf]
 Browser inference:
     tf = 1 + ln(count)
     score = Σ tf_i · combined_i / sqrt(Σ (tf_i · idf_i)²) + intercept
-
-Usage:  python srctrain/export_for_web.py
 """
 
 import sys
