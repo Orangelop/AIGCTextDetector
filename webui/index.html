@@ -175,7 +175,7 @@
 
   <div id="loadingBar"><div class="fill" id="loadingFill"></div></div>
   <div id="loadingStatus">Model not loaded — confirm the download to start.</div>
-
+  <p>本在线演示中使用的模型仅针对中文文本进行训练，输入其他文本可能会导致输出结果出现系统性偏差。</p>
   <textarea id="inputText" placeholder="在此处输入长中文文本，建议至少 1000 字，输入过短或输入其他内容可能导致结果不准确。" disabled></textarea>
   <button id="analyzeBtn" disabled>Analyze Text</button>
 
@@ -617,7 +617,8 @@
     // Only show the one-time prompt when there is no valid local cache.
     if (!hasFreshCache()) {
       const _ = isChinese ? alert(
-        'AI 生成文本检测 Demo\n'
+        'AI 生成文本检测 Demo\n',
+        '本在线演示中使用的模型仅针对中文文本进行训练。输入其他文本可能会导致输出结果出现系统性偏差。\n'
       ) : alert(
         'AI-generated Text Detection Demo\n'
       );
